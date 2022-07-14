@@ -1,21 +1,32 @@
-<script>
-    import { useQuery } from '@sveltestack/svelte-query'
-     const queryResult = useQuery('repoData', () => {
-      return fetch(
-        'https://api.github.com/repos/SvelteStack/svelte-query'
-      ).then(res => res.json())
-    })
-  </script>
-    {#if $queryResult.isLoading}
-    Loading...
-  {:else if $queryResult.error}
-    An error has occurred:
-  {:else}
-    <div>
-      <h1>{$queryResult.data.name}</h1>
-      <p>{$queryResult.data.description}</p>
-      <strong>:eyes: {$queryResult.data.subscribers_count}</strong>{' '}
-      <strong>:sparkles: {$queryResult.data.stargazers_count}</strong>{' '}
-      <strong>:fork_and_knife: {$queryResult.data.forks_count}</strong>
-    </div>
-  {/if}
+<script lang="ts">
+    import { useMutation } from '@sveltestack/svelte-query';
+    const mutation = useMutation((newTodo:any) =>
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newTodo)
+        })
+    );
+    const url = ' https://jsonplaceholder.typicode.com/todos';
+    let title = '';
+    const onSubmit = () => {
+        $mutation.mutate({ userId: 1, title });
+        title = '';
+    };
+</script>
+<div>
+    {#if $mutation.isLoading}
+        <p>...loading</p>
+    <!-- {:else if $mutation.isError}
+        <p>Error : {$mutation.error.message}</p> -->
+    {:else if $mutation.isSuccess}
+        <p>Todo added success</p>
+    {:else}
+        <form on:submit|preventDefault={onSubmit}>
+            <input bind:value={title} type="text" />
+            <button>Click</button>
+        </form>
+    {/if}
+</div>
